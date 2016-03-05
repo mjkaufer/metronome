@@ -1,0 +1,46 @@
+@import url(https://fonts.googleapis.com/css?family=Lato);
+
+* {
+	font-family: 'Lato', sans-serif;
+}
+
+h1{
+	text-align: center;
+}	
+
+#center{
+	margin: 0 auto;
+	text-align: center;
+}
+
+#toggle{
+	margin: 2em 2em;
+}
+
+input{
+	margin: 2em 2em;
+}
+
+#beats{
+	display: flex;
+	margin: 0 20%;
+	height: 100px;
+	vertical-align: bottom;
+}
+
+.beatContainer{
+	flex-grow: 1;
+	margin: 0.25em;
+	position: relative;
+	min-width: 10px;
+	height: 100;
+}
+
+.beat{
+	/*background-color: #2980b9;*/
+	height: 5%;
+	width: 100%;
+	position: absolute;
+	bottom: 0;
+	cursor: pointer;
+}
