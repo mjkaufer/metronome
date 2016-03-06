@@ -5,14 +5,35 @@
 		<link rel="stylesheet" type="text/css" href="css/style.css">
 	</head>
 	<body>
-		<div id="center">
+		<div class="center">
 			<h1>Metronome</h1>
 
 			<div id="beats">
 
 			</div>
 
-			<button id="toggle" onclick="toggleMet()">Toggle Metronome</button>
+			<div id="buttons">
+				<button id="toggle" onclick="toggleMet()">Toggle Metronome</button>
+				<button id="randomize" onclick="randomize()">Randomize Rhythm</button>
+			</div>
+
+			<!-- <br/> -->
+			<div id="inputs" class="center">
+				<div>
+					<label for="bpmInput">BPM</label>
+					<input type="number" class="controls" name="bpmInput" id="bpmInput" min="40" max="280" value="120">
+				</div>
+				<div>
+					<label for="beatCountInput">Beats</label>
+					<input type="number" class="controls" name="beatCountInput" id="beatCountInput" min="1" max="8" value="2">
+				</div>
+				<div>
+					<label for="subdivisionInput">Subdivision</label>
+					<input type="number" class="controls" name="subdivisionInput" id="subdivisionInput" min="1" max="8" value="2">
+				</div>
+			</div>
+
+			<p>Don't switch tabs, or the metronome will stop</p>
 		</div>
 		<script src="js/wad.min.js"></script>
 		<script src="js/TweenMax.min.js"></script>

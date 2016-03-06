@@ -8,17 +8,34 @@ h1{
 	text-align: center;
 }	
 
-#center{
+.center{
 	margin: 0 auto;
 	text-align: center;
 }
 
-#toggle{
+button{
 	margin: 2em 2em;
 }
 
 input{
-	margin: 2em 2em;
+	margin: 0.5em 2em;
+}
+
+#inputs{
+	width: 50%;
+	text-align: center;
+	margin: 0 auto;
+}
+
+label{
+	float: left;
+	width: 10%;
+	
+}
+
+.controls{
+	left: 0;
+	width: 50%;
 }
 
 #beats{

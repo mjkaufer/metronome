@@ -14,6 +14,28 @@ var bellColor = "#e67e22";
 var synthColor = "#27ae60";
 var nullColor = "#95a5a6";
 
+var inputs = document.getElementsByClassName('controls')
+
+for(var i = 0; i < inputs.length; i++){
+	var input = inputs[i]
+	input.onchange = function(e){
+		console.log(e)
+		console.log(this)
+		var key = this.id.replace("Input","")
+		console.log(key,this.value)
+		config[key] = parseInt(this.value)
+		if(key == "bpm"){
+			if(metIsPlaying){
+				stopMet()
+				startMet()
+			}
+		}
+		else
+			syncConfigObj()
+
+	}
+}
+
 var config = {
 	bpm: defaultBPM,
 	beatCount: defaultBeatCount,
@@ -90,6 +112,10 @@ function rgb2hex(rgb){
 		("0" + parseInt(rgb[3],10).toString(16)).slice(-2) : '';
 }
 
+function setBackgroundColor(div, color){
+	div.style.backgroundColor = color
+}
+
 function makeBeat(color, soundIndex){
 	if(!color)
 		color = beatColor
@@ -99,14 +125,16 @@ function makeBeat(color, soundIndex){
 
 	var childDiv = document.createElement('div')
 	childDiv.className="beat"
-	childDiv.style.backgroundColor = color
+	setBackgroundColor(childDiv, color)
+	
 
 	childDiv.onclick = function(){
 		var divColor = rgb2hex(this.style.backgroundColor)
 		var colorKeys = Object.keys(colorSoundMap)
 
 		var newColor = colorKeys[(colorKeys.indexOf(divColor) + 1) % colorKeys.length]
-		this.style.backgroundColor = newColor
+		setBackgroundColor(this, newColor)
+		
 
 	}
 
@@ -117,6 +145,10 @@ function makeBeat(color, soundIndex){
 
 function syncConfigObj(){//syncs the display with config, updating beat counts, etc
 	removeBeats()
+	var metWasPlaying = false
+	if(metIsPlaying)
+		metWasPlaying = true
+	stopMet()
 	for(var i = 0; i < config.beatCount; i++){
 		for(var j = 0; j < config.subdivision; j++){
 			var color = (j==0) ? beatColor : subdivisionColor
@@ -125,12 +157,15 @@ function syncConfigObj(){//syncs the display with config, updating beat counts, 
 	}
 
 	beatElements = document.getElementsByClassName('beat')
+	if(metWasPlaying)
+		startMet()
 
 }
 
 var metIsPlaying = false;
 
 function startMet(){
+	clearAllIntervals()
 	var index = 0;
 	metIsPlaying = true
 
@@ -143,7 +178,7 @@ function startMet(){
 
 		playSound(sound, index == 0 ? 4 : 0)
 
-		TweenMax.to(currentBeat, refreshRate / 1000, {height: '100%', yoyo: true, repeat: 1, ease: Power2.easeOut})
+		TweenMax.fromTo(currentBeat, refreshRate / 1000, {height: '5%'}, {height: '100%', yoyo: true, repeat: 1, ease: Power2.easeOut})
 
 		index+=1
 		index %= beatElements.length
@@ -164,6 +199,21 @@ function toggleMet(){
 		stopMet()
 	else
 		startMet()
+}
+
+window.onblur = function () { 
+	stopMet()
+};
+
+function randomize(){
+	for(var i = 0; i < beatElements.length; i++){
+		var element = beatElements[i]
+		var colorKeys = Object.keys(colorSoundMap)
+		var index = parseInt(Math.random() * colorKeys.length)
+		var color = colorKeys[index]
+		setBackgroundColor(element, color)
+
+	}
 }
 
 syncConfigObj()
