@@ -10,3 +10,5 @@ Because the other ones suck
 	* Chrome doesn't let setInterval fire at its normal rate when the tab is changed
 * More sounds?
 * Better support for different screen sizes
+* Add ability to share rhythms
+	* Through URL parameters or something
