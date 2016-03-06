@@ -24,6 +24,7 @@ for(var i = 0; i < inputs.length; i++){
 		var key = this.id.replace("Input","")
 		console.log(key,this.value)
 		config[key] = parseInt(this.value)
+		updateMetronomeLink()
 		if(key == "bpm"){
 			if(metIsPlaying){
 				stopMet()
@@ -134,7 +135,7 @@ function makeBeat(color, soundIndex){
 
 		var newColor = colorKeys[(colorKeys.indexOf(divColor) + 1) % colorKeys.length]
 		setBackgroundColor(this, newColor)
-		
+		updateMetronomeLink()
 
 	}
 
@@ -143,28 +144,66 @@ function makeBeat(color, soundIndex){
 	return parentDiv
 }
 
-function syncConfigObj(){//syncs the display with config, updating beat counts, etc
+function getParameterByName(name) {
+    var url = window.location.href;
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+
+function renderFromURLParams(){
+
+	if(window.location.href.indexOf("?") == -1)
+		return syncConfigObj()
+
+
+	for(var key in config){
+		config[key] = parseInt(getParameterByName(key)) || config[key]
+		document.getElementById(key+'Input').value = config[key]
+	}
+	
+
+	syncConfigObj(getParameterByName('colorString'))
+
+
+}
+
+function syncConfigObj(colorString){//syncs the display with config, updating beat counts, etc
 	removeBeats()
 	var metWasPlaying = false
 	if(metIsPlaying)
 		metWasPlaying = true
 	stopMet()
+
 	for(var i = 0; i < config.beatCount; i++){
 		for(var j = 0; j < config.subdivision; j++){
 			var color = (j==0) ? beatColor : subdivisionColor
+
+			if(colorString){
+				var colorIndex = parseInt(colorString.substr(i*config.subdivision + j, 1))
+				color = Object.keys(colorSoundMap)[colorIndex]
+			}
+			
 			beatsDiv.appendChild(makeBeat(color))
 		}
 	}
 
 	beatElements = document.getElementsByClassName('beat')
+
 	if(metWasPlaying)
 		startMet()
+
+	updateMetronomeLink()
 
 }
 
 var metIsPlaying = false;
 
 function startMet(){
+
 	clearAllIntervals()
 	var index = 0;
 	metIsPlaying = true
@@ -176,7 +215,7 @@ function startMet(){
 		var currentBeat = beatElements[index]
 		var sound = colorSoundMap[rgb2hex(currentBeat.style.backgroundColor)]
 
-		playSound(sound, index == 0 ? 4 : 0)
+		playSound(sound, index == 0 ? 1.5 : 0)
 
 		TweenMax.fromTo(currentBeat, refreshRate / 1000, {height: '5%'}, {height: '100%', yoyo: true, repeat: 1, ease: Power2.easeOut})
 
@@ -201,6 +240,15 @@ function toggleMet(){
 		startMet()
 }
 
+function getColorString(){
+	var colorString = "";
+	for(var i = 0; i < beatElements.length; i++){
+		colorString+=Object.keys(colorSoundMap).indexOf(rgb2hex(beatElements[i].style.backgroundColor))
+	}
+
+	return colorString
+}
+
 window.onblur = function () { 
 	stopMet()
 };
@@ -212,8 +260,23 @@ function randomize(){
 		var index = parseInt(Math.random() * colorKeys.length)
 		var color = colorKeys[index]
 		setBackgroundColor(element, color)
-
 	}
+
+	updateMetronomeLink()
 }
 
-syncConfigObj()
+function createURL(){
+	var attributes = "?colorString=" + getColorString()
+	for(key in config){
+		attributes += "&" + key + "=" + config[key]
+	}
+
+	return window.location.origin + window.location.pathname + attributes
+}
+
+function updateMetronomeLink(){
+	var newURL = createURL()
+	$('metronomeLink').href = newURL
+}
+
+renderFromURLParams()
