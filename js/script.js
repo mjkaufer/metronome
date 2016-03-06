@@ -5,12 +5,14 @@ function $(id){
 var beatsDiv = $('beats')
 
 var defaultBPM = 120;
-var defaultBeatCount = 4;
-var defaultSubdivision = 2;
+var defaultBeatCount = 2;
+var defaultSubdivision = 4;
 
 var subdivisionColor = "#2980b9";
 var beatColor = "#2c3e50";
-var pianoColor = "#e67e22";
+var bellColor = "#e67e22";
+var synthColor = "#27ae60";
+var nullColor = "#95a5a6";
 
 var config = {
 	bpm: defaultBPM,
@@ -20,7 +22,19 @@ var config = {
 
 var hat = new Wad(Wad.presets.hiHatClosed);
 var snare = new Wad(Wad.presets.snare)
-var piano = new Wad(Wad.presets.piano)
+Wad.presets.piano.env.sustain /= 3
+Wad.presets.piano.env.release /= 3
+var bell = new Wad(Wad.presets.piano)
+var synth = new Wad({
+	source:'sawtooth',
+	env:{
+		hold: 0.015,
+		attack:0.01,
+		decay: 0.005,
+		release:Wad.presets.piano.env.release,
+		sustain: Wad.presets.piano.env.sustain
+	}
+})
 
 var beatElements = []
 
@@ -41,20 +55,22 @@ function clearAllIntervals(){
 }
 
 function playSound(sound, vol){
+	if(!sound)
+		return
+
 	if(!vol)
 		vol = 0.5
+
 	sound.play({volume: vol})
 }
 
-// var colorSoundMap = {
-// 	[beatColor]: playSound(hat),
-// 	[subdivisionColor]: playSound(snare),
-// 	[pianoColor]: playSound(piano)
-// }
+
 var colorSoundMap = {
 	[beatColor]: hat,
 	[subdivisionColor]: snare,
-	[pianoColor]: piano
+	[bellColor]: bell,
+	[synthColor]: synth,
+	[nullColor]: null
 }
 
 function removeBeats(){
@@ -125,7 +141,7 @@ function startMet(){
 		var currentBeat = beatElements[index]
 		var sound = colorSoundMap[rgb2hex(currentBeat.style.backgroundColor)]
 
-		playSound(sound, index == 0 ? 4 : 0.5)
+		playSound(sound, index == 0 ? 4 : 0)
 
 		TweenMax.to(currentBeat, refreshRate / 1000, {height: '100%', yoyo: true, repeat: 1, ease: Power2.easeOut})
 
